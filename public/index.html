@@ -1,32 +1,1871 @@
-<!doctype html><html lang="sw"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Instant Virtual Predictor</title><script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<!doctype html>
+<html lang="sw">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Instant Virtual Predictor</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 <style>
-:root{--b:#1167e8;--d:#08204a;--bg:#f4f8ff;--ink:#12223d;--muted:#708097;--ok:#07965d;--bad:#d54141;--gold:#b97800}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Arial,sans-serif}header{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#07378d,#1788ff);color:#fff;padding:16px 5%;display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900}.nav{display:flex;gap:8px;flex-wrap:wrap}.nav button{background:transparent;color:#fff;border:0;padding:8px;cursor:pointer}
-main{max-width:1180px;margin:auto;padding:24px 16px}.hero{border-radius:24px;background:linear-gradient(135deg,#07378d,#1788ff);color:#fff;padding:38px;margin-bottom:18px;box-shadow:0 15px 40px #0a4ea525}.hero h1{font-size:40px;margin:0 0 10px}.hero p{line-height:1.6;max-width:820px}.card{background:#fff;border-radius:18px;padding:22px;margin:18px 0;box-shadow:0 8px 28px #0a204a12}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.two{grid-template-columns:repeat(2,1fr)}.stat{font-size:28px;font-weight:900}.muted{color:var(--muted);font-size:13px}.btn{border:0;border-radius:10px;padding:12px 17px;font-weight:800;cursor:pointer}.blue{background:var(--b);color:#fff}.soft{background:#eaf2ff;color:#145bc4}input,select,textarea{width:100%;padding:12px;border:1px solid #d6e0ef;border-radius:10px;margin:6px 0 12px}.upload{border:2px dashed #87b8ff;padding:26px;border-radius:16px;text-align:center;background:#f8fbff}.preview{max-width:100%;max-height:340px;border-radius:12px;display:none;margin:12px auto}.msg{padding:11px;border-radius:10px;background:#f0f5fc;margin-top:10px}.badge{display:inline-block;padding:5px 9px;border-radius:20px;background:#eaf2ff;color:#145bc4;font-size:11px;font-weight:800;margin:2px}.win{color:var(--ok);font-weight:900}.loss{color:var(--bad);font-weight:900}.pending{color:var(--gold);font-weight:900}table{width:100%;border-collapse:collapse}th,td{padding:11px;border-bottom:1px solid #e9eef6;text-align:left;font-size:13px}.hide{display:none!important}.fixture{padding:12px;border:1px solid #e0e8f5;border-radius:12px;margin:8px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}
-@media(max-width:720px){.nav{display:none}.hero h1{font-size:29px}.grid,.two{grid-template-columns:1fr}table{display:block;overflow:auto}}
-</style></head><body><header><div class="logo">🔵 INSTANT VIRTUAL PREDICTOR</div><div class="nav"><button onclick="go('home')">Home</button><button onclick="go('dashboard')">Dashboard</button><button onclick="go('history')">History</button><button onclick="go('admin')">Admin</button><button onclick="logout()">Logout</button></div></header><main id="app"></main>
+:root{
+--b:#1167e8;--d:#08204a;--bg:#f4f8ff;--ink:#12223d;
+--muted:#708097;--ok:#07965d;--bad:#d54141;--gold:#b97800
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Arial,sans-serif}
+header{
+position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#07378d,#1788ff);
+color:#fff;padding:16px 5%;display:flex;justify-content:space-between;align-items:center
+}
+.logo{font-weight:900}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav button{background:transparent;color:#fff;border:0;padding:8px;cursor:pointer}
+main{max-width:1180px;margin:auto;padding:24px 16px}
+.hero{
+border-radius:24px;background:linear-gradient(135deg,#07378d,#1788ff);
+color:#fff;padding:38px;margin-bottom:18px;box-shadow:0 15px 40px #0a4ea525
+}
+.hero h1{font-size:40px;margin:0 0 10px}
+.hero p{line-height:1.6;max-width:820px}
+.card{
+background:#fff;border-radius:18px;padding:22px;margin:18px 0;
+box-shadow:0 8px 28px #0a204a12
+}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.two{grid-template-columns:repeat(2,1fr)}
+.stat{font-size:28px;font-weight:900}
+.muted{color:var(--muted);font-size:13px}
+.btn{border:0;border-radius:10px;padding:12px 17px;font-weight:800;cursor:pointer}
+.blue{background:var(--b);color:#fff}
+.soft{background:#eaf2ff;color:#145bc4}
+.danger{background:#ffecec;color:#c62828}
+input,select,textarea{
+width:100%;padding:12px;border:1px solid #d6e0ef;
+border-radius:10px;margin:6px 0 12px
+}
+.upload{
+border:2px dashed #87b8ff;padding:26px;border-radius:16px;
+text-align:center;background:#f8fbff
+}
+.preview{max-width:100%;max-height:340px;border-radius:12px;display:none;margin:12px auto}
+.msg{padding:11px;border-radius:10px;background:#f0f5fc;margin-top:10px}
+.badge{
+display:inline-block;padding:5px 9px;border-radius:20px;
+background:#eaf2ff;color:#145bc4;font-size:11px;font-weight:800;margin:2px
+}
+.win{color:var(--ok);font-weight:900}
+.loss{color:var(--bad);font-weight:900}
+.pending{color:var(--gold);font-weight:900}
+table{width:100%;border-collapse:collapse}
+th,td{
+padding:11px;border-bottom:1px solid #e9eef6;
+text-align:left;font-size:13px
+}
+.hide{display:none!important}
+.fixture{
+padding:12px;border:1px solid #e0e8f5;border-radius:12px;
+margin:8px 0;display:flex;justify-content:space-between;
+gap:10px;align-items:center
+}
+.history-box{
+max-height:350px;
+overflow:auto;
+border:1px solid #e0e8f5;
+border-radius:12px;
+margin-top:12px
+}
+.history-empty{
+padding:20px;
+text-align:center;
+color:var(--muted)
+}
+.small{font-size:12px}
+.success{
+background:#eafaf3;
+color:#087847;
+padding:10px;
+border-radius:10px;
+margin-top:10px
+}
+.warning{
+background:#fff8e6;
+color:#8a6100;
+padding:10px;
+border-radius:10px;
+margin-top:10px
+}
+@media(max-width:720px){
+.nav{display:none}
+.hero h1{font-size:29px}
+.grid,.two{grid-template-columns:1fr}
+table{display:block;overflow:auto}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">🔵 INSTANT VIRTUAL PREDICTOR</div>
+
+<div class="nav">
+<button onclick="go('home')">Home</button>
+<button onclick="go('dashboard')">Dashboard</button>
+<button onclick="go('history')">History</button>
+<button onclick="go('admin')">Admin</button>
+<button onclick="logout()">Logout</button>
+</div>
+</header>
+
+<main id="app"></main>
+
 <script>
-let S={user:null,settings:null,ai:false,fixtures:[]};const $=x=>document.getElementById(x);
-async function api(p,o={}){let r=await fetch(p,{headers:{"Content-Type":"application/json"},...o}),d=await r.json();if(!r.ok)throw Error(d.error||"Request failed");return d}
-async function boot(){let d=await api("/api/config");S.user=d.user;S.settings=d.settings;S.ai=d.aiEnabled;go(S.user?"dashboard":"home")}
-function go(p){if(p==="home")home();else if(p==="dashboard")dashboard();else if(p==="history")history();else if(p==="admin")admin()}
-function home(){app.innerHTML=`<section class=hero><h1>Virtual & Instant Football</h1><p>Screenshot → OCR/AI Vision → Fixture extraction → Analysis → Prediction → Verified result history. Odds are kept separate from the analysis engine.</p></section><div class=card><h2>🔐 Login / Register</h2><div class="grid two"><form onsubmit="login(event)"><h3>Login</h3><input id=le type=email placeholder=Email required><input id=lp type=password placeholder=Password required><button class="btn blue">Login</button></form><form onsubmit="reg(event)"><h3>Register</h3><input id=rn placeholder=Name><input id=re type=email placeholder=Email required><input id=rp type=password placeholder=Password required><button class="btn blue">Create account</button></form></div><div id=msg></div></div>`}
-async function login(e){e.preventDefault();try{let d=await api("/api/login",{method:"POST",body:JSON.stringify({email:le.value,password:lp.value})});S.user=d.user;go("dashboard")}catch(x){msg.textContent=x.message}}
-async function reg(e){e.preventDefault();try{let d=await api("/api/register",{method:"POST",body:JSON.stringify({name:rn.value,email:re.value,password:rp.value})});msg.textContent=d.message}catch(x){msg.textContent=x.message}}
-async function logout(){await api("/api/logout",{method:"POST"});S.user=null;go("home")}
-function dashboard(){if(!S.user)return home();app.innerHTML=`<section class=hero><h1>Dashboard</h1><p>Account: <b>${S.user.email}</b> · Status: <b>${S.user.active?"ACTIVE":"NOT ACTIVE"}</b></p></section>${!S.user.active?`<div class=card><h2>💳 Subscription: TSh ${Number(S.settings.priceTsh).toLocaleString()}</h2><p>${S.settings.paymentInstructions}</p><p><b>${S.settings.paymentMethod}:</b> ${S.settings.paymentNumber||"Admin hajajaweka namba"} ${S.settings.paymentName?"· "+S.settings.paymentName:""}</p><form onsubmit="pay(event)"><input id=ref placeholder="Transaction reference" required><button class="btn blue">Submit Payment</button></form><div id=paymsg></div></div>`:""}<div class=card><h2>📸 Upload Screenshot</h2><div class=upload><input id=shot type=file accept="image/*"><img id=prev class=preview><button class="btn blue" onclick="ocr()" ${S.user.active?"":"disabled"}>Read Games</button><div id=ocrmsg class=muted>${S.ai?"AI Vision is enabled.":"Browser OCR mode is enabled."}</div></div></div><div class=card><h2>⚽ Games Found</h2><div id=fixtures>${S.fixtures.length?S.fixtures.map((f,i)=>fixture(f,i)).join(""):"Upload screenshot to extract fixtures."}</div></div><div class=card><h2>🤖 Prediction Engine</h2><p class=muted>Prediction uses stored results/statistical history. Odds are not used.</p><form onsubmit="predict(event)"><div class=grid two><div><label>Team A</label><input id=ta required><label>Market</label><select id=market><option>1X2</option><option>Over/Under</option><option>GG/NG</option><option>Double Chance</option></select></div><div><label>Team B</label><input id=tb required><label>Optional: market note</label><input id=note placeholder="e.g. Over 2.5"></div></div><button class="btn blue">Analyze & Save</button></form><div id=predmsg></div></div>`;shot.onchange=()=>{if(shot.files[0]){prev.src=URL.createObjectURL(shot.files[0]);prev.style.display="block"}}}
-function fixture(f,i){return `<div class=fixture><span><b>${f.teamA}</b> vs <b>${f.teamB}</b></span><button class="btn soft" onclick="useFixture(${i})">Analyze</button></div>`}
-function useFixture(i){ta.value=S.fixtures[i].teamA;tb.value=S.fixtures[i].teamB;window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})}
-async function ocr(){let f=shot.files[0];if(!f)return;ocrmsg.textContent="Reading screenshot…";try{let image=await dataURL(f);let local=await Tesseract.recognize(f,"eng",{logger:m=>{if(m.status==="recognizing text")ocrmsg.textContent="OCR "+Math.round(m.progress*100)+"%"}});let d=await api("/api/ocr",{method:"POST",body:JSON.stringify({text:local.data.text,imageData:image})});S.fixtures=d.fixtures;ocrmsg.textContent=`${d.method}: ${S.fixtures.length} fixtures found`;document.getElementById("fixtures").innerHTML=S.fixtures.length?S.fixtures.map((x,i)=>fixture(x,i)).join(""):"No fixtures found. Try a clearer screenshot."}catch(e){ocrmsg.textContent=e.message}}
-function dataURL(f){return new Promise((ok,no)=>{let r=new FileReader;r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)})}
-async function predict(e){e.preventDefault();try{let d=await api("/api/predict",{method:"POST",body:JSON.stringify({teamA:ta.value,teamB:tb.value,market:market.value})});predmsg.innerHTML=`<div class=msg><b>${d.prediction.teamA} vs ${d.prediction.teamB}</b><br>Pick: <b>${d.prediction.prediction}</b> · Confidence estimate: <b>${d.prediction.confidence}%</b><br>${d.prediction.reason}<br><small>Odds used: ${d.prediction.oddsUsed}</small></div>`}catch(x){predmsg.textContent=x.message}}
-async function pay(e){e.preventDefault();try{let d=await api("/api/payment",{method:"POST",body:JSON.stringify({reference:ref.value})});paymsg.textContent=d.message}catch(x){paymsg.textContent=x.message}}
-async function history(){if(!S.user)return home();let d=await api("/api/history");app.innerHTML=`<div class=card><h2>🏆 Prediction History</h2><table><tr><th>Game</th><th>Pick</th><th>Confidence</th><th>Result</th><th>Status</th></tr>${d.predictions.map(p=>`<tr><td>${p.teamA} vs ${p.teamB}</td><td>${p.prediction}</td><td>${p.confidence}%</td><td>${p.actualScore||"—"}</td><td class=${p.status.toLowerCase()}>${p.status}</td></tr>`).join("")}</table></div>`}
-async function admin(){if(!S.user)return home();try{let d=await api("/api/admin");app.innerHTML=`<section class=hero><h1>🔐 Admin Panel</h1><p>Admin account is free and has full control.</p></section><div class=grid><div class=card><div class=muted>Users</div><div class=stat>${d.users.length}</div></div><div class=card><div class=muted>Payments</div><div class=stat>${d.payments.length}</div></div><div class=card><div class=muted>Predictions</div><div class=stat>${d.predictions.length}</div></div></div><div class=card><h2>💰 Payments</h2><table><tr><th>User</th><th>Amount</th><th>Reference</th><th>Status</th><th></th></tr>${d.payments.map(p=>`<tr><td>${(d.users.find(u=>u.id===p.userId)||{}).email||""}</td><td>TSh ${p.amount.toLocaleString()}</td><td>${p.reference}</td><td>${p.status}</td><td>${p.status==="pending"?`<button class="btn blue" onclick="payAction('${p.id}','approved')">Approve</button> <button onclick="payAction('${p.id}','rejected')">Reject</button>`:"—"}</td></tr>`).join("")}</table></div><div class=card><h2>🏆 Verify Prediction Results</h2><table><tr><th>Game</th><th>Pick</th><th>Status</th><th>Score A</th><th>Score B</th><th></th></tr>${d.predictions.map(p=>`<tr><td>${p.teamA} vs ${p.teamB}</td><td>${p.prediction}</td><td>${p.status}</td><td><input id=a_${p.id} type=number min=0></td><td><input id=b_${p.id} type=number min=0></td><td><button onclick="result('${p.id}','WIN')">WIN</button><button onclick="result('${p.id}','LOSS')">LOSS</button></td></tr>`).join("")}</table></div><div class=card><h2>⚙️ Payment / Subscription Settings</h2><form onsubmit="settings(event)"><label>Price (TSh)</label><input id=price type=number value=${d.settings.priceTsh}><label>Subscription days</label><input id=days type=number value=${d.settings.subscriptionDays}><label>Payment method</label><input id=pm value="${esc(d.settings.paymentMethod)}"><label>Payment number</label><input id=pn value="${esc(d.settings.paymentNumber)}"><label>Payment name</label><input id=pp value="${esc(d.settings.paymentName)}"><label>Instructions</label><textarea id=pi>${esc(d.settings.paymentInstructions)}</textarea><button class="btn blue">Save</button></form></div></div>`}catch(x){app.innerHTML=`<div class=card><h2>Admin</h2><p>${x.message}</p></div>`}}
-function esc(x){return String(x||"").replaceAll("&","&amp;").replaceAll('"',"&quot;").replaceAll("<","&lt;").replaceAll(">","&gt;")}
-async function payAction(id,status){await api("/api/admin",{method:"POST",body:JSON.stringify({action:"payment",id,status})});admin()}
-async function result(id,status){await api("/api/admin",{method:"POST",body:JSON.stringify({action:"result",id,status,scoreA:document.getElementById("a_"+id).value,scoreB:document.getElementById("b_"+id).value,actualScore:document.getElementById("a_"+id).value+"-"+document.getElementById("b_"+id).value})});admin()}
-async function settings(e){e.preventDefault();await api("/api/admin",{method:"POST",body:JSON.stringify({action:"settings",settings:{priceTsh:Number(price.value),subscriptionDays:Number(days.value),paymentMethod:pm.value,paymentNumber:pn.value,paymentName:pp.value,paymentInstructions:pi.value}})});alert("Saved");boot()}
+
+let S={
+user:null,
+settings:null,
+ai:false,
+fixtures:[],
+historicalResults:[]
+};
+
+const $=x=>document.getElementById(x);
+
+
+/* =========================
+   API
+========================= */
+
+async function api(p,o={}){
+let r=await fetch(p,{
+headers:{"Content-Type":"application/json"},
+...o
+});
+
+let d;
+
+try{
+d=await r.json();
+}catch(e){
+throw Error("Server returned an invalid response");
+}
+
+if(!r.ok)throw Error(d.error||"Request failed");
+
+return d;
+}
+
+
+/* =========================
+   BOOT
+========================= */
+
+async function boot(){
+
+try{
+
+let d=await api("/api/config");
+
+S.user=d.user;
+S.settings=d.settings;
+S.ai=d.aiEnabled;
+
+loadHistoricalLocal();
+
+go(S.user?"dashboard":"home");
+
+}catch(e){
+
+console.error(e);
+
+app.innerHTML=`
+<div class="card">
+<h2>Connection Error</h2>
+<p>${esc(e.message)}</p>
+</div>
+`;
+
+}
+
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function go(p){
+
+if(p==="home")home();
+else if(p==="dashboard")dashboard();
+else if(p==="history")history();
+else if(p==="admin")admin();
+
+}
+
+
+/* =========================
+   HOME
+========================= */
+
+function home(){
+
+app.innerHTML=`
+
+<section class="hero">
+
+<h1>Virtual & Instant Football</h1>
+
+<p>
+Screenshot → OCR/AI Vision → Fixture extraction →
+Analysis → Prediction → Verified result history.
+Odds are kept separate from the analysis engine.
+</p>
+
+</section>
+
+<div class="card">
+
+<h2>🔐 Login / Register</h2>
+
+<div class="grid two">
+
+<form onsubmit="login(event)">
+
+<h3>Login</h3>
+
+<input id="le" type="email" placeholder="Email" required>
+
+<input id="lp" type="password" placeholder="Password" required>
+
+<button class="btn blue">Login</button>
+
+</form>
+
+
+<form onsubmit="reg(event)">
+
+<h3>Register</h3>
+
+<input id="rn" placeholder="Name">
+
+<input id="re" type="email" placeholder="Email" required>
+
+<input id="rp" type="password" placeholder="Password" required>
+
+<button class="btn blue">Create account</button>
+
+</form>
+
+</div>
+
+<div id="msg"></div>
+
+</div>
+`;
+
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function login(e){
+
+e.preventDefault();
+
+try{
+
+let d=await api("/api/login",{
+method:"POST",
+body:JSON.stringify({
+email:le.value,
+password:lp.value
+})
+});
+
+S.user=d.user;
+
+loadHistoricalLocal();
+
+go("dashboard");
+
+}catch(x){
+
+msg.textContent=x.message;
+
+}
+
+}
+
+
+/* =========================
+   REGISTER
+========================= */
+
+async function reg(e){
+
+e.preventDefault();
+
+try{
+
+let d=await api("/api/register",{
+method:"POST",
+body:JSON.stringify({
+name:rn.value,
+email:re.value,
+password:rp.value
+})
+});
+
+msg.textContent=d.message;
+
+}catch(x){
+
+msg.textContent=x.message;
+
+}
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout(){
+
+try{
+await api("/api/logout",{method:"POST"});
+}catch(e){}
+
+S.user=null;
+
+go("home");
+
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function dashboard(){
+
+if(!S.user)return home();
+
+app.innerHTML=`
+
+<section class="hero">
+
+<h1>Dashboard</h1>
+
+<p>
+Account: <b>${esc(S.user.email)}</b>
+· Status:
+<b>${S.user.active?"ACTIVE":"NOT ACTIVE"}</b>
+</p>
+
+</section>
+
+
+${!S.user.active?`
+
+<div class="card">
+
+<h2>💳 Subscription: TSh ${Number(S.settings.priceTsh).toLocaleString()}</h2>
+
+<p>${esc(S.settings.paymentInstructions)}</p>
+
+<p>
+<b>${esc(S.settings.paymentMethod)}:</b>
+${esc(S.settings.paymentNumber||"Admin hajajaweka namba")}
+${S.settings.paymentName?" · "+esc(S.settings.paymentName):""}
+</p>
+
+<form onsubmit="pay(event)">
+
+<input id="ref" placeholder="Transaction reference" required>
+
+<button class="btn blue">Submit Payment</button>
+
+</form>
+
+<div id="paymsg"></div>
+
+</div>
+
+`:""}
+
+
+/* =========================
+   HISTORICAL RESULTS IMPORT
+========================= */
+
+<div class="card">
+
+<h2>📥 Import Historical Results</h2>
+
+<p class="muted">
+Upload historical football results in CSV format.
+These results are stored locally and can also be sent to the predictor backend.
+</p>
+
+<div class="upload">
+
+<input
+id="historyFile"
+type="file"
+accept=".csv,text/csv"
+/>
+
+<br>
+
+<button
+class="btn blue"
+onclick="importHistoricalResults()">
+Import Historical Results
+</button>
+
+<button
+class="btn danger"
+onclick="clearHistoricalResults()">
+Clear Historical Data
+</button>
+
+</div>
+
+<div class="warning">
+
+<b>CSV format:</b><br>
+
+<code>
+date,teamA,teamB,scoreA,scoreB
+</code>
+
+<br><br>
+
+Example:
+
+<code>
+2026-09-17,Barcelona,Real Madrid,2,1
+</code>
+
+</div>
+
+<div id="historicalMsg"></div>
+
+<div id="historicalPreview"></div>
+
+</div>
+
+
+/* =========================
+   OCR
+========================= */
+
+<div class="card">
+
+<h2>📸 Upload Screenshot</h2>
+
+<div class="upload">
+
+<input id="shot" type="file" accept="image/*">
+
+<img id="prev" class="preview">
+
+<button
+class="btn blue"
+onclick="ocr()"
+${S.user.active?"":"disabled"}>
+Read Games
+</button>
+
+<div id="ocrmsg" class="muted">
+
+${S.ai?
+"AI Vision is enabled.":
+"Browser OCR mode is enabled."}
+
+</div>
+
+</div>
+
+</div>
+
+
+/* =========================
+   GAMES
+========================= */
+
+<div class="card">
+
+<h2>⚽ Games Found</h2>
+
+<div id="fixtures">
+
+${S.fixtures.length?
+S.fixtures.map((f,i)=>fixture(f,i)).join(""):
+"Upload screenshot to extract fixtures."}
+
+</div>
+
+</div>
+
+
+/* =========================
+   PREDICTION
+========================= */
+
+<div class="card">
+
+<h2>🤖 Prediction Engine</h2>
+
+<p class="muted">
+
+Prediction uses stored results/statistical history.
+Odds are not used.
+
+</p>
+
+<form onsubmit="predict(event)">
+
+<div class="grid two">
+
+<div>
+
+<label>Team A</label>
+
+<input id="ta" required>
+
+<label>Market</label>
+
+<select id="market">
+
+<option>1X2</option>
+<option>Over/Under</option>
+<option>GG/NG</option>
+<option>Double Chance</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>Team B</label>
+
+<input id="tb" required>
+
+<label>Optional: market note</label>
+
+<input
+id="note"
+placeholder="e.g. Over 2.5">
+
+</div>
+
+</div>
+
+<button class="btn blue">
+Analyze & Save
+</button>
+
+</form>
+
+<div id="predmsg"></div>
+
+</div>
+
+`;
+
+shot.onchange=()=>{
+
+if(shot.files[0]){
+
+prev.src=URL.createObjectURL(shot.files[0]);
+
+prev.style.display="block";
+
+}
+
+};
+
+renderHistoricalResults();
+
+}
+
+
+/* =========================
+   FIXTURE
+========================= */
+
+function fixture(f,i){
+
+return `
+
+<div class="fixture">
+
+<span>
+
+<b>${esc(f.teamA)}</b>
+vs
+<b>${esc(f.teamB)}</b>
+
+</span>
+
+<button
+class="btn soft"
+onclick="useFixture(${i})">
+
+Analyze
+
+</button>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================
+   USE FIXTURE
+========================= */
+
+function useFixture(i){
+
+ta.value=S.fixtures[i].teamA;
+
+tb.value=S.fixtures[i].teamB;
+
+window.scrollTo({
+top:document.body.scrollHeight,
+behavior:"smooth"
+});
+
+}
+
+
+/* =========================
+   OCR
+========================= */
+
+async function ocr(){
+
+let f=shot.files[0];
+
+if(!f)return;
+
+ocrmsg.textContent="Reading screenshot…";
+
+try{
+
+let image=await dataURL(f);
+
+let local=await Tesseract.recognize(
+f,
+"eng",
+{
+logger:m=>{
+
+if(m.status==="recognizing text"){
+
+ocrmsg.textContent=
+"OCR "+Math.round(m.progress*100)+"%";
+
+}
+
+}
+}
+);
+
+let d=await api("/api/ocr",{
+method:"POST",
+body:JSON.stringify({
+text:local.data.text,
+imageData:image
+})
+});
+
+S.fixtures=d.fixtures;
+
+ocrmsg.textContent=
+`${d.method}: ${S.fixtures.length} fixtures found`;
+
+document.getElementById("fixtures").innerHTML=
+
+S.fixtures.length?
+
+S.fixtures.map((x,i)=>fixture(x,i)).join(""):
+
+"No fixtures found. Try a clearer screenshot.";
+
+}catch(e){
+
+ocrmsg.textContent=e.message;
+
+}
+
+}
+
+
+/* =========================
+   DATA URL
+========================= */
+
+function dataURL(f){
+
+return new Promise((ok,no)=>{
+
+let r=new FileReader();
+
+r.onload=()=>ok(r.result);
+
+r.onerror=no;
+
+r.readAsDataURL(f);
+
+});
+
+}
+
+
+/* =========================
+   PREDICT
+========================= */
+
+async function predict(e){
+
+e.preventDefault();
+
+try{
+
+let d=await api("/api/predict",{
+
+method:"POST",
+
+body:JSON.stringify({
+
+teamA:ta.value,
+teamB:tb.value,
+market:market.value
+
+})
+
+});
+
+predmsg.innerHTML=`
+
+<div class="msg">
+
+<b>
+${esc(d.prediction.teamA)}
+vs
+${esc(d.prediction.teamB)}
+</b>
+
+<br>
+
+Pick:
+<b>${esc(d.prediction.prediction)}</b>
+
+· Confidence estimate:
+<b>${d.prediction.confidence}%</b>
+
+<br>
+
+${esc(d.prediction.reason)}
+
+<br>
+
+<small>
+Odds used: ${esc(d.prediction.oddsUsed)}
+</small>
+
+</div>
+
+`;
+
+}catch(x){
+
+predmsg.textContent=x.message;
+
+}
+
+}
+
+
+/* =========================
+   PAYMENT
+========================= */
+
+async function pay(e){
+
+e.preventDefault();
+
+try{
+
+let d=await api("/api/payment",{
+
+method:"POST",
+
+body:JSON.stringify({
+reference:ref.value
+})
+
+});
+
+paymsg.textContent=d.message;
+
+}catch(x){
+
+paymsg.textContent=x.message;
+
+}
+
+}
+
+
+/* =========================================================
+   HISTORICAL RESULTS
+========================================================= */
+
+
+/*
+Expected CSV:
+
+date,teamA,teamB,scoreA,scoreB
+
+Example:
+
+2026-09-17,Barcelona,Real Madrid,2,1
+2026-09-16,Arsenal,Chelsea,3,0
+*/
+
+
+function importHistoricalResults(){
+
+let file=document.getElementById("historyFile").files[0];
+
+if(!file){
+
+historicalMsg.innerHTML=
+`<div class="warning">Please choose a CSV file first.</div>`;
+
+return;
+
+}
+
+if(!file.name.toLowerCase().endsWith(".csv")){
+
+historicalMsg.innerHTML=
+`<div class="warning">Please select a CSV file.</div>`;
+
+return;
+
+}
+
+let reader=new FileReader();
+
+reader.onload=async function(e){
+
+try{
+
+let text=e.target.result;
+
+let rows=parseCSV(text);
+
+if(rows.length<2){
+
+throw Error("CSV file does not contain enough data.");
+
+}
+
+let headers=rows[0].map(x=>x.trim().toLowerCase());
+
+let required=[
+"teamA".toLowerCase(),
+"teamB".toLowerCase(),
+"scoreA".toLowerCase(),
+"scoreB".toLowerCase()
+];
+
+let missing=required.filter(x=>!headers.includes(x));
+
+if(missing.length){
+
+throw Error(
+"Missing columns: "+missing.join(", ")
+);
+
+}
+
+let imported=[];
+
+for(let i=1;i<rows.length;i++){
+
+let row=rows[i];
+
+if(!row.length)continue;
+
+let obj={};
+
+headers.forEach((h,index)=>{
+obj[h]=row[index]||"";
+});
+
+let teamA=
+obj.teama||
+obj["team a"]||
+"";
+
+let teamB=
+obj.teamb||
+obj["team b"]||
+"";
+
+let scoreA=
+Number(obj.scorea);
+
+let scoreB=
+Number(obj.scoreb);
+
+if(!teamA||!teamB||
+Number.isNaN(scoreA)||
+Number.isNaN(scoreB)){
+
+continue;
+
+}
+
+imported.push({
+
+date:obj.date||"",
+teamA:teamA.trim(),
+teamB:teamB.trim(),
+scoreA:scoreA,
+scoreB:scoreB
+
+});
+
+}
+
+if(!imported.length){
+
+throw Error(
+"No valid historical results were found."
+);
+
+}
+
+
+/* Avoid duplicate results */
+
+let existing=loadHistoricalLocal();
+
+let combined=[
+...existing,
+...imported
+];
+
+let unique=[];
+
+let keys=new Set();
+
+combined.forEach(r=>{
+
+let key=[
+r.date,
+r.teamA.toLowerCase(),
+r.teamB.toLowerCase(),
+r.scoreA,
+r.scoreB
+].join("|");
+
+if(!keys.has(key)){
+
+keys.add(key);
+unique.push(r);
+
+}
+
+});
+
+S.historicalResults=unique;
+
+saveHistoricalLocal();
+
+
+/* Try sending data to backend */
+
+let backendMessage="";
+
+try{
+
+let response=await api(
+"/api/historical-results",
+{
+method:"POST",
+body:JSON.stringify({
+results:imported
+})
+}
+);
+
+backendMessage=
+response.message||
+"Historical results sent to server.";
+
+}catch(serverError){
+
+backendMessage=
+"Saved locally. Backend endpoint /api/historical-results is not available yet.";
+
+}
+
+
+historicalMsg.innerHTML=`
+
+<div class="success">
+
+<strong>Import successful.</strong><br>
+
+Imported:
+<b>${imported.length}</b> results.<br>
+
+Total stored:
+<b>${S.historicalResults.length}</b> results.<br>
+
+<span class="small">
+${backendMessage}
+</span>
+
+</div>
+
+`;
+
+renderHistoricalResults();
+
+}catch(err){
+
+historicalMsg.innerHTML=`
+
+<div class="warning">
+
+Import failed:
+<b>${esc(err.message)}</b>
+
+</div>
+
+`;
+
+}
+
+};
+
+reader.readAsText(file);
+
+}
+
+
+/* =========================
+   CSV PARSER
+========================= */
+
+function parseCSV(text){
+
+let rows=[];
+
+let row=[];
+
+let cell="";
+
+let insideQuotes=false;
+
+for(let i=0;i<text.length;i++){
+
+let c=text[i];
+
+if(c==='"'){
+
+if(insideQuotes && text[i+1]==='"'){
+
+cell+='"';
+i++;
+
+}else{
+
+insideQuotes=!insideQuotes;
+
+}
+
+}else if(c===','&&!insideQuotes){
+
+row.push(cell.trim());
+cell="";
+
+}else if((c==="\n"||c==="\r")&&!insideQuotes){
+
+if(c==="\r"&&text[i+1]==="\n")i++;
+
+row.push(cell.trim());
+
+if(row.some(x=>x!==""))rows.push(row);
+
+row=[];
+cell="";
+
+}else{
+
+cell+=c;
+
+}
+
+}
+
+if(cell!==""||row.length){
+
+row.push(cell.trim());
+
+if(row.some(x=>x!==""))rows.push(row);
+
+}
+
+return rows;
+
+}
+
+
+/* =========================
+   LOCAL STORAGE
+========================= */
+
+function historicalStorageKey(){
+
+let email=S.user&&S.user.email?
+S.user.email:
+"guest";
+
+return "instantVirtualPredictorHistorical_"+email;
+
+}
+
+
+function saveHistoricalLocal(){
+
+try{
+
+localStorage.setItem(
+historicalStorageKey(),
+JSON.stringify(S.historicalResults)
+);
+
+}catch(e){
+
+console.error(e);
+
+}
+
+}
+
+
+function loadHistoricalLocal(){
+
+try{
+
+let raw=localStorage.getItem(
+historicalStorageKey()
+);
+
+S.historicalResults=
+raw?JSON.parse(raw):[];
+
+return S.historicalResults;
+
+}catch(e){
+
+S.historicalResults=[];
+
+return [];
+
+}
+
+}
+
+
+/* =========================
+   DISPLAY HISTORICAL DATA
+========================= */
+
+function renderHistoricalResults(){
+
+let box=document.getElementById(
+"historicalPreview"
+);
+
+if(!box)return;
+
+if(!S.historicalResults.length){
+
+box.innerHTML=`
+
+<div class="history-empty">
+
+No historical results imported yet.
+
+</div>
+
+`;
+
+return;
+
+}
+
+let rows=S.historicalResults
+.slice()
+.reverse()
+.map(r=>`
+
+<tr>
+
+<td>${esc(r.date||"—")}</td>
+
+<td>${esc(r.teamA)}</td>
+
+<td>${esc(r.teamB)}</td>
+
+<td>${r.scoreA}</td>
+
+<td>${r.scoreB}</td>
+
+<td>
+
+${
+r.scoreA>r.scoreB?
+'<span class="win">HOME WIN</span>':
+r.scoreA<r.scoreB?
+'<span class="loss">AWAY WIN</span>':
+'<span class="pending">DRAW</span>'
+}
+
+</td>
+
+</tr>
+
+`).join("");
+
+box.innerHTML=`
+
+<h3>
+Imported Results
+<span class="badge">
+${S.historicalResults.length}
+</span>
+</h3>
+
+<div class="history-box">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Date</th>
+<th>Team A</th>
+<th>Team B</th>
+<th>A</th>
+<th>B</th>
+<th>Result</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+${rows}
+
+</tbody>
+
+</table>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================
+   CLEAR HISTORICAL RESULTS
+========================= */
+
+async function clearHistoricalResults(){
+
+if(!S.historicalResults.length){
+
+alert("There are no historical results to clear.");
+
+return;
+
+}
+
+if(!confirm(
+"Are you sure you want to clear all imported historical results?"
+))return;
+
+S.historicalResults=[];
+
+localStorage.removeItem(
+historicalStorageKey()
+);
+
+
+/* Try clearing backend too */
+
+try{
+
+await api(
+"/api/historical-results",
+{
+method:"DELETE"
+}
+);
+
+}catch(e){
+
+/*
+Backend endpoint may not exist yet.
+Local data is still cleared.
+*/
+
+}
+
+historicalMsg.innerHTML=`
+
+<div class="success">
+
+Historical results cleared successfully.
+
+</div>
+
+`;
+
+renderHistoricalResults();
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+async function history(){
+
+if(!S.user)return home();
+
+try{
+
+let d=await api("/api/history");
+
+app.innerHTML=`
+
+<div class="card">
+
+<h2>🏆 Prediction History</h2>
+
+<table>
+
+<tr>
+
+<th>Game</th>
+<th>Pick</th>
+<th>Confidence</th>
+<th>Result</th>
+<th>Status</th>
+
+</tr>
+
+${
+d.predictions.map(p=>`
+
+<tr>
+
+<td>
+${esc(p.teamA)}
+vs
+${esc(p.teamB)}
+</td>
+
+<td>${esc(p.prediction)}</td>
+
+<td>${p.confidence}%</td>
+
+<td>${esc(p.actualScore||"—")}</td>
+
+<td class="${String(p.status).toLowerCase()}">
+${esc(p.status)}
+</td>
+
+</tr>
+
+`).join("")
+}
+
+</table>
+
+</div>
+
+`;
+
+}catch(e){
+
+app.innerHTML=`
+
+<div class="card">
+
+<h2>History</h2>
+
+<p>${esc(e.message)}</p>
+
+</div>
+
+`;
+
+}
+
+}
+
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+async function admin(){
+
+if(!S.user)return home();
+
+try{
+
+let d=await api("/api/admin");
+
+app.innerHTML=`
+
+<section class="hero">
+
+<h1>🔐 Admin Panel</h1>
+
+<p>
+Admin account is free and has full control.
+</p>
+
+</section>
+
+
+<div class="grid">
+
+<div class="card">
+
+<div class="muted">Users</div>
+
+<div class="stat">
+${d.users.length}
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="muted">Payments</div>
+
+<div class="stat">
+${d.payments.length}
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="muted">Predictions</div>
+
+<div class="stat">
+${d.predictions.length}
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>💰 Payments</h2>
+
+<table>
+
+<tr>
+
+<th>User</th>
+<th>Amount</th>
+<th>Reference</th>
+<th>Status</th>
+<th></th>
+
+</tr>
+
+${d.payments.map(p=>`
+
+<tr>
+
+<td>
+${esc(
+(d.users.find(u=>u.id===p.userId)||{}).email||""
+)}
+</td>
+
+<td>
+TSh ${p.amount.toLocaleString()}
+</td>
+
+<td>
+${esc(p.reference)}
+</td>
+
+<td>
+${esc(p.status)}
+</td>
+
+<td>
+
+${
+p.status==="pending"?
+
+`
+
+<button
+class="btn blue"
+onclick="payAction('${p.id}','approved')">
+Approve
+</button>
+
+<button
+onclick="payAction('${p.id}','rejected')">
+Reject
+</button>
+
+`:"—"
+
+}
+
+</td>
+
+</tr>
+
+`).join("")}
+
+</table>
+
+</div>
+
+
+<div class="card">
+
+<h2>🏆 Verify Prediction Results</h2>
+
+<table>
+
+<tr>
+
+<th>Game</th>
+<th>Pick</th>
+<th>Status</th>
+<th>Score A</th>
+<th>Score B</th>
+<th></th>
+
+</tr>
+
+${d.predictions.map(p=>`
+
+<tr>
+
+<td>
+${esc(p.teamA)}
+vs
+${esc(p.teamB)}
+</td>
+
+<td>${esc(p.prediction)}</td>
+
+<td>${esc(p.status)}</td>
+
+<td>
+
+<input
+id="a_${p.id}"
+type="number"
+min="0">
+
+</td>
+
+<td>
+
+<input
+id="b_${p.id}"
+type="number"
+min="0">
+
+</td>
+
+<td>
+
+<button
+onclick="result('${p.id}','WIN')">
+WIN
+</button>
+
+<button
+onclick="result('${p.id}','LOSS')">
+LOSS
+</button>
+
+</td>
+
+</tr>
+
+`).join("")}
+
+</table>
+
+</div>
+
+
+<div class="card">
+
+<h2>⚙️ Payment / Subscription Settings</h2>
+
+<form onsubmit="settings(event)">
+
+<label>Price (TSh)</label>
+
+<input
+id="price"
+type="number"
+value="${d.settings.priceTsh}">
+
+<label>Subscription days</label>
+
+<input
+id="days"
+type="number"
+value="${d.settings.subscriptionDays}">
+
+<label>Payment method</label>
+
+<input
+id="pm"
+value="${esc(d.settings.paymentMethod)}">
+
+<label>Payment number</label>
+
+<input
+id="pn"
+value="${esc(d.settings.paymentNumber)}">
+
+<label>Payment name</label>
+
+<input
+id="pp"
+value="${esc(d.settings.paymentName)}">
+
+<label>Instructions</label>
+
+<textarea id="pi">
+${esc(d.settings.paymentInstructions)}
+</textarea>
+
+<button class="btn blue">
+Save
+</button>
+
+</form>
+
+</div>
+
+
+<div class="card">
+
+<h2>📊 Imported Historical Results</h2>
+
+<p class="muted">
+
+Historical results stored in this browser:
+<b>${S.historicalResults.length}</b>
+
+</p>
+
+<button
+class="btn danger"
+onclick="clearHistoricalResults()">
+
+Clear Local Historical Data
+
+</button>
+
+</div>
+
+`;
+
+}catch(x){
+
+app.innerHTML=`
+
+<div class="card">
+
+<h2>Admin</h2>
+
+<p>${esc(x.message)}</p>
+
+</div>
+
+`;
+
+}
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function esc(x){
+
+return String(x||"")
+.replaceAll("&","&amp;")
+.replaceAll('"',"&quot;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;");
+
+}
+
+
+/* =========================
+   ADMIN PAYMENT
+========================= */
+
+async function payAction(id,status){
+
+await api("/api/admin",{
+
+method:"POST",
+
+body:JSON.stringify({
+action:"payment",
+id,
+status
+})
+
+});
+
+admin();
+
+}
+
+
+/* =========================
+   ADMIN RESULT
+========================= */
+
+async function result(id,status){
+
+await api("/api/admin",{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"result",
+id,
+status,
+
+scoreA:
+document.getElementById("a_"+id).value,
+
+scoreB:
+document.getElementById("b_"+id).value,
+
+actualScore:
+document.getElementById("a_"+id).value+
+"-"+
+document.getElementById("b_"+id).value
+
+})
+
+});
+
+admin();
+
+}
+
+
+/* =========================
+   SETTINGS
+========================= */
+
+async function settings(e){
+
+e.preventDefault();
+
+await api("/api/admin",{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"settings",
+
+settings:{
+
+priceTsh:Number(price.value),
+
+subscriptionDays:
+Number(days.value),
+
+paymentMethod:pm.value,
+
+paymentNumber:pn.value,
+
+paymentName:pp.value,
+
+paymentInstructions:pi.value
+
+}
+
+})
+
+});
+
+alert("Saved");
+
 boot();
-</script></body></html>
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+boot();
+
+</script>
+
+</body>
+</html>
