@@ -1,0 +1,16 @@
+{
+  "settings": {
+    "siteName": "Instant Virtual Predictor",
+    "priceTsh": 20000,
+    "subscriptionDays": 30,
+    "paymentMethod": "Mobile Money",
+    "paymentNumber": "",
+    "paymentName": "",
+    "paymentInstructions": "Lipa TSh 20,000 kwenye namba iliyoonyeshwa, kisha weka transaction reference. Access itafunguliwa baada ya verification."
+  },
+  "users": [],
+  "payments": [],
+  "predictions": [],
+  "results": [],
+  "history": []
+}
